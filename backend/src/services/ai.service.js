@@ -20,7 +20,8 @@ export async function generateResponse(messages) {
     } else if (msg.role === "ai") {
       return new AIMessage(msg.content);
     }
-  }));
+    return null;
+  }).filter(msg => msg !== null));
 
   return response;
 }
