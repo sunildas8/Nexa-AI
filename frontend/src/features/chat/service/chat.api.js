@@ -7,21 +7,24 @@ const api = axios.create({
 
 /**
  * Send a message — creates a new chat if no chatId is provided.
- * Returns: { userMessage, AIMessage, title, chat }
+ * Returns: { userMessage, aiMessage, title, chat }
  */
-export async function sendMessage({ content, chatId = null }) {
-    const response = await api.post('/api/chat/send', { content, chatId });
+export const sendMessage = async(message, chatId) => {
+    const response = await api.post('/api/chats/message', { message, chat: chatId });
     return response.data;
 }
 
-/** Get all chats for the logged-in user. Returns: { chats: [...] } */
-export async function getChats() {
-    const response = await api.get('/api/chat');
+export const getChats = async () => {
+    const response = await api.get('/api/chats');
     return response.data;
 }
 
-/** Get all messages for a specific chat. Returns: { messages: [...] } */
-export async function getChatMessages(chatId) {
-    const response = await api.get(`/api/chat/${chatId}/messages`);
+export const getChatMessages = async (chatId) => {
+    const response = await api.get(`/api/chats/${chatId}/messages`);
+    return response.data;
+}
+
+export const deleteChat = async (chatId) => {
+    const response = await api.delete(`/api/chats/delete/${chatId}`);
     return response.data;
 }

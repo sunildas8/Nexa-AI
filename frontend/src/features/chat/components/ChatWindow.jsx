@@ -9,7 +9,9 @@ const ChatWindow = ({ messages, isLoading, isDark }) => {
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
   };
 
   useEffect(() => {
@@ -38,6 +40,7 @@ const ChatWindow = ({ messages, isLoading, isDark }) => {
       className={`flex-1 overflow-y-auto p-6 transition-colors duration-200 ${
         isDark ? 'bg-gray-900' : 'bg-white'
       }`}
+      style={{ scrollBehavior: 'smooth' }}
     >
       <div className="max-w-4xl mx-auto">
         {messages.map((msg) => (

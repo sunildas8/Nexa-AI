@@ -1,7 +1,8 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { useTheme } from '../hooks/useTheme';
-import { useChatState } from '../hooks/useChatState';
+import { useChat } from '../hooks/useChat';
+import { setCurrentChatId, setChats } from '../chat.slice';
 import Sidebar from '../components/Sidebar';
 import ChatWindow from '../components/ChatWindow';
 import ChatInput from '../components/ChatInput';
@@ -10,24 +11,48 @@ import ChatInput from '../components/ChatInput';
  * Dashboard Component - Main layout orchestrating all chat components
  */
 const Dashboard = () => {
+  const chat = useChat();
+  const dispatch = useDispatch();
   const { isDark, toggleTheme } = useTheme();
-  const {
-    messages,
-    isLoading,
-    chatHistory,
-    currentChatId,
-    addUserMessage,
-    simulateAIResponse,
-    startNewChat,
-    loadChat,
-    clearHistory,
-  } = useChatState();
-
+  
+  // Get Redux state
+  const chats = useSelector((state) => state.chat.chats);
+  const currentChatId = useSelector((state) => state.chat.currentChatId);
+  const isLoading = useSelector((state) => state.chat.isLoading);
   const { user } = useSelector((state) => state.auth);
 
+  // Derive current messages from Redux store
+  const messages = currentChatId && chats[currentChatId] 
+    ? chats[currentChatId].messages 
+    : [];
+
+  // Convert chats object to array for Sidebar
+  const chatHistory = Object.values(chats);
+
+  useEffect(() => {
+    if (chat?.initializeSocketConnection) {
+      chat.initializeSocketConnection();
+    }
+  }, [chat]);
+
   const handleSendMessage = async (content) => {
-    addUserMessage(content);
-    await simulateAIResponse(content);
+    await chat.handleSendMessage(content, currentChatId);
+  };
+
+  const handleNewChat = () => {
+    dispatch(setCurrentChatId(null));
+  };
+
+  const handleLoadChat = (chatId) => {
+    dispatch(setCurrentChatId(chatId));
+  };
+
+  const handleClearHistory = () => {
+    if (window.confirm('Are you sure you want to clear all chat history?')) {
+      // Clear all chats from Redux
+      dispatch(setChats({}));
+      dispatch(setCurrentChatId(null));
+    }
   };
 
   return (
@@ -36,9 +61,9 @@ const Dashboard = () => {
     }`}>
       <Sidebar
         chatHistory={chatHistory}
-        onNewChat={startNewChat}
-        onSelectChat={loadChat}
-        onClearHistory={clearHistory}
+        onNewChat={handleNewChat}
+        onSelectChat={handleLoadChat}
+        onClearHistory={handleClearHistory}
         currentChatId={currentChatId}
         isDark={isDark}
         onToggleTheme={toggleTheme}
@@ -60,8 +85,8 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className={`flex flex-col overflow-visible transition-all duration-200 my-auto  ${
-          messages.length === 0 ? 'justify-center' : 'flex-1'
+        <div className={`flex flex-col flex-1 overflow-hidden transition-all duration-200 ${
+          messages.length === 0 ? 'justify-center' : ''
         }`}>
           <ChatWindow messages={messages} isLoading={isLoading} isDark={isDark} />
 

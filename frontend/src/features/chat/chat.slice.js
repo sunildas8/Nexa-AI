@@ -1,132 +1,58 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import {
-    sendMessage as sendMessageApi,
-    getChats,
-    getChatMessages,
-} from './service/chat.api';
-
-/* ─── Async Thunks ─── */
-
-export const fetchChats = createAsyncThunk(
-    'chat/fetchChats',
-    async (_, { rejectWithValue }) => {
-        try {
-            const data = await getChats();
-            return data;
-        } catch (err) {
-            return rejectWithValue(err.response?.data?.message || 'Failed to fetch chats');
-        }
-    }
-);
-
-export const fetchMessages = createAsyncThunk(
-    'chat/fetchMessages',
-    async (chatId, { rejectWithValue }) => {
-        try {
-            const data = await getChatMessages(chatId);
-            return data;
-        } catch (err) {
-            return rejectWithValue(err.response?.data?.message || 'Failed to fetch messages');
-        }
-    }
-);
-
-export const sendChatMessage = createAsyncThunk(
-    'chat/sendMessage',
-    async ({ content, chatId }, { rejectWithValue }) => {
-        try {
-            const data = await sendMessageApi({ content, chatId });
-            return data;
-        } catch (err) {
-            return rejectWithValue(err.response?.data?.message || 'Failed to send message');
-        }
-    }
-);
-
-/* ─── Slice ─── */
+import { createSlice } from '@reduxjs/toolkit';
 
 const chatSlice = createSlice({
     name: 'chat',
     initialState: {
-        chats: [],          // sidebar history list
-        activeChat: null,   // currently open chat object
-        messages: [],       // messages in the active chat
-        isTyping: false,    // typing indicator
-        loading: false,
+        chats: {},
+        currentChatId: null,
+        isLoading: false,
         error: null,
     },
     reducers: {
-        setActiveChat(state, action) {
-            state.activeChat = action.payload;
-            state.messages = [];
+        createNewChat: (state, action) => {
+            const { chatId, title } = action.payload;
+            state.chats[chatId] = {
+                id: chatId,
+                title: title || 'New Chat',
+                messages: [],
+                lastUpdated: new Date().toISOString(),
+            };
         },
-        startNewChat(state) {
-            state.activeChat = null;
-            state.messages = [];
+        addNewMessage: (state, action) => {
+            const { chatId, content, role } = action.payload;
+            state.chats[chatId].messages.push({ content, role });
         },
-    },
-    extraReducers: (builder) => {
-        /* fetchChats */
-        builder
-            .addCase(fetchChats.pending, (state) => { state.loading = true; })
-            .addCase(fetchChats.fulfilled, (state, action) => {
-                state.loading = false;
-                state.chats = action.payload.chats ?? action.payload ?? [];
-            })
-            .addCase(fetchChats.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
-            });
+        setChats: (state, action) => {
+            state.chats = action.payload
+        },
+        setCurrentChatId: (state, action) => {
+            state.currentChatId = action.payload
+        },
+        setLoading: (state, action) => {
+            state.isLoading = action.payload
+        },
+        setError: (state, action) => {
+            state.error = action.payload
+        }
+    }
+})
 
-        /* fetchMessages */
-        builder
-            .addCase(fetchMessages.pending, (state) => { state.loading = true; })
-            .addCase(fetchMessages.fulfilled, (state, action) => {
-                state.loading = false;
-                state.messages = action.payload.messages ?? action.payload ?? [];
-            })
-            .addCase(fetchMessages.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
-            });
-
-        /* sendChatMessage */
-        builder
-            .addCase(sendChatMessage.pending, (state, action) => {
-                state.isTyping = true;
-                // Optimistically add the user's message immediately
-                state.messages.push({
-                    _id: `temp-${Date.now()}`,
-                    role: 'user',
-                    content: action.meta.arg.content,
-                    createdAt: new Date().toISOString(),
-                });
-            })
-            .addCase(sendChatMessage.fulfilled, (state, action) => {
-                state.isTyping = false;
-                const { userMessage, AIMessage, chat } = action.payload;
-
-                // Remove the optimistic message and replace with real ones
-                state.messages = state.messages.filter((m) => !m._id.startsWith('temp-'));
-                if (userMessage) state.messages.push(userMessage);
-                if (AIMessage) state.messages.push(AIMessage);
-
-                // Update or insert the chat in the sidebar list
-                if (chat) {
-                    state.activeChat = chat;
-                    const idx = state.chats.findIndex((c) => c._id === chat._id);
-                    if (idx === -1) state.chats.unshift(chat);
-                    else state.chats[idx] = chat;
-                }
-            })
-            .addCase(sendChatMessage.rejected, (state, action) => {
-                state.isTyping = false;
-                state.error = action.payload;
-                // Roll back optimistic message
-                state.messages = state.messages.filter((m) => !m._id.startsWith('temp-'));
-            });
-    },
-});
-
-export const { setActiveChat, startNewChat } = chatSlice.actions;
+export const { setChats, setCurrentChatId, setLoading, setError, createNewChat, addNewMessage } = chatSlice.actions;
 export default chatSlice.reducer;
+
+// chats = {
+//     "docker and aws": {
+//         messages: [
+//             {
+//                 role: 'user',
+//                 content: 'How do I deploy a Docker container on AWS?'
+//             },
+//             {
+//                 role: 'ai',
+//                 content: 'To deploy a Docker container on AWS, you can use Amazon Elastic Container Service (ECS) or Amazon Elastic Kubernetes Service (EKS). Here are the general steps for using ECS:'
+//             },
+//         ],
+//         id: "docker-and-aws",
+//         lastUpdated: "2024-06-01T12:00:00Z"
+//     }
+// }

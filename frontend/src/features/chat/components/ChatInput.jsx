@@ -208,6 +208,7 @@ const ChatInput = ({ onSendMessage, isLoading, isDark }) => {
           </button>
         </div>
       </form>
+      
     </div>
   );
 };
