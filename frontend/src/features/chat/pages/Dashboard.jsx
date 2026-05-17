@@ -85,8 +85,8 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className={`flex flex-col flex-1 overflow-hidden transition-all duration-200 ${
-          messages.length === 0 ? 'justify-center' : ''
+        <div className={`flex flex-col overflow-hidden transition-all duration-200 my-auto ${
+          messages.length === 0 ? 'justify-center' : 'flex-1'
         }`}>
           <ChatWindow messages={messages} isLoading={isLoading} isDark={isDark} />
 
