@@ -14,33 +14,47 @@ export const useChat = () => {
     async function handleSendMessage(message, chatId) {
         // Implementation for sending message
         try {
+            const messageId = `msg-${Date.now()}-${Math.random()}`;
+            const timestamp = new Date().toISOString();
+            
+            // If this is a new chat, create it immediately
+            let targetChatId = chatId;
+            if (!chatId) {
+                targetChatId = `temp-${Date.now()}`;
+                dispatch(createNewChat({
+                    chatId: targetChatId,
+                    title: message.substring(0, 30) + '...'
+                }));
+                dispatch(setCurrentChatId(targetChatId));
+            }
+            
+            // Add user message IMMEDIATELY (before API call)
+            dispatch(addNewMessage({
+                chatId: targetChatId,
+                content: message,
+                role: 'user',
+                id: messageId,
+                timestamp: timestamp
+            }));
+            
+            // Set loading state
             dispatch(setLoading(true));
             dispatch(setError(null));
             
+            // Make API call
             const data = await sendMessage(message, chatId);
-            const { chat, aiMessage } = data;
+            const { aiMessage } = data;
             
-            // If this is a new chat, create it in Redux store
-            if (!chatId && chat) {
-                dispatch(createNewChat({
-                    chatId: chat._id,
-                    title: chat.title
-                }));
-                dispatch(setCurrentChatId(chat._id));
-            }
-            
-            // Add user message to the store
-            dispatch(addNewMessage({
-                chatId: chat._id,
-                content: message,
-                role: 'user'
-            }));
+            // If this was a new chat, we now have the real chat ID from server
+            // For now, add AI message to the current chat
+            const finalChatId = chatId || targetChatId;
             
             // Add AI response to the store
             dispatch(addNewMessage({
-                chatId: chat._id,
+                chatId: finalChatId,
                 content: aiMessage.content,
-                role: aiMessage.role
+                role: aiMessage.role,
+                timestamp: new Date().toISOString()
             }));
             
             dispatch(setLoading(false));
@@ -51,9 +65,35 @@ export const useChat = () => {
         }
     }
 
+    async function handleGetChats() {
+        try {
+            dispatch(setLoading(true));
+            dispatch(setError(null));
+
+            const data = await getChats();
+            const { chats } = data
+            
+            dispatch(setChats(chats.reduce((acc, chat) => {
+                acc[chat._id] = {
+                    id: chat._id,
+                    title: chat.title,
+                    messages: [],
+                    lastUpdated: chat.updatedAt
+                };
+                return acc;
+            }, {})));
+            dispatch(setLoading(false));
+        } catch (error) {
+            console.error('Error fetching chats:', error);
+            dispatch(setError(error.response?.data?.message || 'Failed to fetch chats'));
+            dispatch(setLoading(false));
+        }
+    }
+
     return {
         initializeSocketConnection,
         handleSendMessage,
+        handleGetChats,
         // sendMessage,
         // getChatMessages,
         // getChats,

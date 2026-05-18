@@ -31,12 +31,15 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (chat?.initializeSocketConnection) {
-      chat.initializeSocketConnection();
+      chat.initializeSocketConnection(); 
     }
   }, [chat]);
 
   const handleSendMessage = async (content) => {
     await chat.handleSendMessage(content, currentChatId);
+  };
+  const handleGetChats = () => {
+    dispatch(chat.handleGetChats());
   };
 
   const handleNewChat = () => {
@@ -62,6 +65,7 @@ const Dashboard = () => {
       <Sidebar
         chatHistory={chatHistory}
         onNewChat={handleNewChat}
+        onGetChats={handleGetChats}
         onSelectChat={handleLoadChat}
         onClearHistory={handleClearHistory}
         currentChatId={currentChatId}
