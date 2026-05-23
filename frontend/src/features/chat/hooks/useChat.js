@@ -1,6 +1,6 @@
 import { initializeSocketConnection } from '../service/chat.socket';
 import { sendMessage, getChatMessages, getChats, deleteChat } from '../service/chat.api';
-import { setChats, setCurrentChatId, setLoading, setError, createNewChat, addNewMessage  } from '../chat.slice';
+import { setChats, setCurrentChatId, setLoading, setError, createNewChat, addNewMessage, deleteChat as deleteChatFromStore  } from '../chat.slice';
 import { useDispatch } from 'react-redux';
 
 /**
@@ -19,11 +19,15 @@ export const useChat = () => {
             
             // If this is a new chat, create it immediately
             let targetChatId = chatId;
+            let isNewChat = false;
+            const chatTitle = message.substring(0, 30) + '...';
+            
             if (!chatId) {
                 targetChatId = `temp-${Date.now()}`;
+                isNewChat = true;
                 dispatch(createNewChat({
                     chatId: targetChatId,
-                    title: message.substring(0, 30) + '...'
+                    title: chatTitle
                 }));
                 dispatch(setCurrentChatId(targetChatId));
             }
@@ -43,11 +47,32 @@ export const useChat = () => {
             
             // Make API call
             const data = await sendMessage(message, chatId);
-            const { aiMessage } = data;
+            const { aiMessage, chat } = data;
             
-            // If this was a new chat, we now have the real chat ID from server
-            // For now, add AI message to the current chat
-            const finalChatId = chatId || targetChatId;
+            // If this was a new chat, update with the real chat ID from server
+            let finalChatId = chatId || targetChatId;
+            if (isNewChat && chat && chat._id) {
+                finalChatId = chat._id;
+                // Create the chat with real ID
+                dispatch(createNewChat({
+                    chatId: finalChatId,
+                    title: chatTitle
+                }));
+                // Add user message to real chat
+                dispatch(addNewMessage({
+                    chatId: finalChatId,
+                    content: message,
+                    role: 'user',
+                    id: messageId,
+                    timestamp: timestamp
+                }));
+                // Delete the temporary chat from Redux
+                dispatch(deleteChatFromStore({
+                    chatId: targetChatId
+                }));
+                // Update Redux with the real chat ID
+                dispatch(setCurrentChatId(finalChatId));
+            }
             
             // Add AI response to the store
             dispatch(addNewMessage({

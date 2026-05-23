@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Copy, Check } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
@@ -7,7 +7,29 @@ import ReactMarkdown from 'react-markdown';
  */
 const MessageBubble = ({ message, isDark }) => {
   const [copied, setCopied] = useState(false);
+  const [displayedContent, setDisplayedContent] = useState('');
   const isUserMessage = message.role === 'user';
+
+  // Typing effect for AI messages
+  useEffect(() => {
+    if (isUserMessage) {
+      setDisplayedContent(message.content);
+      return;
+    }
+
+    let index = 0;
+    const typingSpeed = 5; // milliseconds per character
+    const timer = setInterval(() => {
+      if (index < message.content.length) {
+        setDisplayedContent(message.content.substring(0, index + 1));
+        index++;
+      } else {
+        clearInterval(timer);
+      }
+    }, typingSpeed);
+
+    return () => clearInterval(timer);
+  }, [message.content, isUserMessage]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(message.content);
@@ -18,14 +40,14 @@ const MessageBubble = ({ message, isDark }) => {
   return (
     <div className={`flex ${isUserMessage ? 'justify-end' : 'justify-start'} mb-4`}>
       <div
-        className={`group max-w-xs lg:max-w-md xl:max-w-lg px-4 py-3 rounded-lg transition-all duration-200 ${
+        className={`group max-w-full lg:max-w-full xl:max-w-full px-4 py-3 rounded-lg transition-all duration-200 ${
           isUserMessage
             ? isDark
               ? 'bg-blue-600 text-white rounded-br-none'
               : 'bg-blue-500 text-white rounded-br-none'
             : isDark
-            ? 'bg-gray-800 text-gray-100 rounded-bl-none'
-            : 'bg-gray-100 text-gray-900 rounded-bl-none'
+            ? ' text-gray-100 rounded-bl-none'
+            : ' text-gray-900 rounded-bl-none'
         }`}
       >
         {isUserMessage ? (
@@ -83,7 +105,7 @@ const MessageBubble = ({ message, isDark }) => {
                 ),
               }}
             >
-              {message.content}
+              {displayedContent}
             </ReactMarkdown>
           </div>
         )}
