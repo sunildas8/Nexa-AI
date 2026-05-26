@@ -2,9 +2,10 @@ import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { AIMessage, HumanMessage, SystemMessage, tool, createAgent } from "langchain";
 import { ChatMistralAI } from "@langchain/mistralai";
 import * as z from "zod";
+import { searchInternet } from "./internet.service.js";
 
 const geminiModel = new ChatGoogleGenerativeAI({
-  model: "gemini-2.5-flash-lite",
+  model: "gemini-flash-lite-latest",
   apiKey: process.env.GEMINI_API_KEY
 });
 
@@ -13,8 +14,8 @@ const mistralModel = new ChatMistralAI({
   apiKey: process.env.MISTRAL_API_KEY
 })
 
-const searchInternetTool = tool("searchInternet", {
-  name: "Search Internet",
+const searchInternetTool = tool(searchInternet, {
+  name: "searchInternet",
   description: "Use this tool to get the latest information from the internet.",
   schema: z.object({
     query: z.string().describe("The search query to find relevant information on the internet.")
@@ -27,18 +28,58 @@ const agent = createAgent({
 })
 
 export async function generateResponse(messages) {
+
   const response = await agent.invoke({
     messages: messages.map(msg => {
-    if (msg.role === "user") {
-      return new HumanMessage(msg.content);
-    } else if (msg.role === "ai") {
-      return new AIMessage(msg.content);
-    }
-    return null;
-  }).filter(msg => msg !== null)
-});
+      if (msg.role === "user") {
+        return new HumanMessage(msg.content);
+      } 
+      
+      if (msg.role === "ai") {
+        return new AIMessage(msg.content);
+      }
 
-  return response.messages[ response.messages.length - 1 ].text;
+      return null;
+    }).filter(Boolean)
+  });
+
+  return response.messages[response.messages.length - 1].content;
+}
+
+/**
+ * Stream AI response chunk by chunk
+ * Calls onChunk callback with each chunk as it arrives
+ */
+export async function generateResponseStream(messages, onChunk) {
+  try {
+    // Use streaming if available
+    const stream = await geminiModel.stream(
+      {
+        messages: messages.map(msg => {
+        if (msg.role === "user") {
+          return new HumanMessage(msg.content);
+        } 
+        
+        if (msg.role === "ai") {
+          return new AIMessage(msg.content);
+        }
+
+        return null;
+      }).filter(Boolean)
+    });
+
+    // Process stream chunks
+    for await (const chunk of stream) {
+      if (chunk.content) {
+        await onChunk(chunk.content);
+      }
+    }
+  } catch (error) {
+    console.error("Error in generateResponseStream:", error);
+    // Fallback to non-streaming if streaming fails
+    const fullResponse = await generateResponse(messages);
+    await onChunk(fullResponse);
+  }
 }
 
 export async function generateChatTitle(message) {
@@ -50,5 +91,5 @@ export async function generateChatTitle(message) {
     new HumanMessage(`Generate a concise and relevant title for a chat conversation based on the following message: "${message}"`)
   ])
   
-  return response.text;
+  return response.content.trim().replace(/(^"|"$)/g, '');
 }

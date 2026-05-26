@@ -1,6 +1,6 @@
 import { initializeSocketConnection } from '../service/chat.socket';
 import { sendMessage, getChatMessages, getChats, deleteChat } from '../service/chat.api';
-import { setChats, setCurrentChatId, setLoading, setError, createNewChat, addNewMessage, deleteChat as deleteChatFromStore  } from '../chat.slice';
+import { setChats, setCurrentChatId, setLoading, setError, createNewChat, addNewMessage, deleteChat as deleteChatFromStore, setMessagesForChat  } from '../chat.slice';
 import { useDispatch } from 'react-redux';
 
 /**
@@ -15,7 +15,7 @@ export const useChat = () => {
         // Implementation for sending message
         try {
             const messageId = `msg-${Date.now()}-${Math.random()}`;
-            const timestamp = new Date().toISOString();
+            const aiMessageId = `msg-${Date.now()}-${Math.random()}-ai`;
             
             // If this is a new chat, create it immediately
             let targetChatId = chatId;
@@ -37,55 +37,100 @@ export const useChat = () => {
                 chatId: targetChatId,
                 content: message,
                 role: 'user',
-                id: messageId,
-                timestamp: timestamp
+                id: messageId
             }));
             
             // Set loading state
             dispatch(setLoading(true));
             dispatch(setError(null));
             
-            // Make API call
-            const data = await sendMessage(message, chatId);
-            const { aiMessage, chat } = data;
-            
-            // If this was a new chat, update with the real chat ID from server
+            // Create initial AI message placeholder
             let finalChatId = chatId || targetChatId;
-            if (isNewChat && chat && chat._id) {
-                finalChatId = chat._id;
-                // Create the chat with real ID
-                dispatch(createNewChat({
-                    chatId: finalChatId,
-                    title: chatTitle
-                }));
-                // Add user message to real chat
-                dispatch(addNewMessage({
-                    chatId: finalChatId,
-                    content: message,
-                    role: 'user',
-                    id: messageId,
-                    timestamp: timestamp
-                }));
-                // Delete the temporary chat from Redux
-                dispatch(deleteChatFromStore({
-                    chatId: targetChatId
-                }));
-                // Update Redux with the real chat ID
-                dispatch(setCurrentChatId(finalChatId));
-            }
+            let aiMessageContent = '';
             
-            // Add AI response to the store
-            dispatch(addNewMessage({
-                chatId: finalChatId,
-                content: aiMessage.content,
-                role: aiMessage.role,
-                timestamp: new Date().toISOString()
-            }));
+            // Make streaming API call
+            const streamResponse = await sendMessage(message, chatId);
+            
+            // Process stream events
+            for await (const event of streamResponse) {
+                if (event.type === 'init') {
+                    const { chat } = event;
+                    
+                    // If this was a new chat, update with the real chat ID from server
+                    if (isNewChat && chat && chat._id) {
+                        finalChatId = chat._id;
+                        // Create the chat with real ID
+                        dispatch(createNewChat({
+                            chatId: finalChatId,
+                            title: chatTitle
+                        }));
+                        // Add user message to real chat
+                        dispatch(addNewMessage({
+                            chatId: finalChatId,
+                            content: message,
+                            role: 'user',
+                            id: messageId
+                        }));
+                        // Delete the temporary chat from Redux
+                        dispatch(deleteChatFromStore({
+                            chatId: targetChatId
+                        }));
+                        // Update Redux with the real chat ID
+                        dispatch(setCurrentChatId(finalChatId));
+                    }
+                    
+                    // Add initial AI message with empty content
+                    dispatch(addNewMessage({
+                        chatId: finalChatId,
+                        content: '',
+                        role: 'ai',
+                        id: aiMessageId
+                    }));
+                } else if (event.type === 'chunk') {
+                    // Accumulate chunk and update message
+                    aiMessageContent += event.content;
+                    dispatch(addNewMessage({
+                        chatId: finalChatId,
+                        content: aiMessageContent,
+                        role: 'ai',
+                        id: aiMessageId
+                    }));
+                } else if (event.type === 'complete') {
+                    // Stream complete, update with final message
+                    dispatch(addNewMessage({
+                        chatId: finalChatId,
+                        content: aiMessageContent,
+                        role: 'ai',
+                        id: aiMessageId
+                    }));
+                } else if (event.type === 'error') {
+                    dispatch(setError(event.message || 'Failed to send message'));
+                }
+            }
             
             dispatch(setLoading(false));
         } catch (error) {
             console.error('Error sending message:', error);
-            dispatch(setError(error.response?.data?.message || 'Failed to send message'));
+            dispatch(setError(error.message || 'Failed to send message'));
+            dispatch(setLoading(false));
+        }
+    }
+
+    async function handleLoadChatMessages(chatId) {
+        try {
+            dispatch(setLoading(true));
+            const data = await getChatMessages(chatId);
+            const { messages } = data;
+            
+            // Update Redux with fetched messages
+            dispatch(setMessagesForChat({
+                chatId,
+                messages
+            }));
+            dispatch(setLoading(false));
+        } catch (error) {
+            console.error('Error loading chat messages:', error);
+            dispatch(setError(error.message || 'Failed to load chat messages'));
             dispatch(setLoading(false));
         }
     }
@@ -119,6 +164,7 @@ export const useChat = () => {
         initializeSocketConnection,
         handleSendMessage,
         handleGetChats,
+        handleLoadChatMessages,
         // sendMessage,
         // getChatMessages,
         // getChats,

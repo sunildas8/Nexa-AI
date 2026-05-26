@@ -21,6 +21,22 @@ const chatSlice = createSlice({
         addNewMessage: (state, action) => {
             const { chatId, content, role, id, timestamp } = action.payload;
             if (state.chats[chatId]) {
+                // For AI messages (streaming), find and update existing message with same ID
+                if (role === 'ai' && id) {
+                    const existingMessageIndex = state.chats[chatId].messages.findIndex(msg => msg.id === id);
+                    if (existingMessageIndex !== -1) {
+                        // Update existing message
+                        state.chats[chatId].messages[existingMessageIndex] = {
+                            id,
+                            content,
+                            role,
+                            timestamp: timestamp || new Date().toISOString()
+                        };
+                        return;
+                    }
+                }
+                
+                // For new messages, append to array
                 state.chats[chatId].messages.push({ 
                     id: id || `msg-${Date.now()}-${Math.random()}`,
                     content, 
@@ -44,11 +60,17 @@ const chatSlice = createSlice({
         deleteChat: (state, action) => {
             const { chatId } = action.payload;
             delete state.chats[chatId];
+        },
+        setMessagesForChat: (state, action) => {
+            const { chatId, messages } = action.payload;
+            if (state.chats[chatId]) {
+                state.chats[chatId].messages = messages;
+            }
         }
     }
 })
 
-export const { setChats, setCurrentChatId, setLoading, setError, createNewChat, addNewMessage, deleteChat } = chatSlice.actions;
+export const { setChats, setCurrentChatId, setLoading, setError, createNewChat, addNewMessage, deleteChat, setMessagesForChat } = chatSlice.actions;
 export default chatSlice.reducer;
 
 // chats = {

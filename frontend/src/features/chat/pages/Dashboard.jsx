@@ -48,6 +48,8 @@ const Dashboard = () => {
 
   const handleLoadChat = (chatId) => {
     dispatch(setCurrentChatId(chatId));
+    // Load messages for the selected chat
+    chat.handleLoadChatMessages(chatId);
   };
 
   const handleClearHistory = () => {

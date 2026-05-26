@@ -1,4 +1,4 @@
-import { generateResponse, generateChatTitle } from "../services/ai.service.js";
+import { generateResponse, generateChatTitle, generateResponseStream } from "../services/ai.service.js";
 import chatModel from "../model/chat.model.js";
 import messageModel from "../model/message.model.js";
 
@@ -22,34 +22,63 @@ export async function sendMessage(req, res) {
             })
         }
 
+        const finalChatId = chatId || chat._id;
+
         const userMessage = await messageModel.create({
-            chat: chatId || chat._id,
+            chat: finalChatId,
             content: message,
             role: "user",
         })
 
-        const messages = await messageModel.find({chat: chatId || chat._id}).sort({ createdAt: 1 })
+        const messages = await messageModel.find({chat: finalChatId}).sort({ createdAt: 1 })
 
-        const result = await generateResponse(messages);
+        // Set headers for streaming
+        res.setHeader('Content-Type', 'application/x-ndjson');
+        res.setHeader('Transfer-Encoding', 'chunked');
+        res.setHeader('Cache-Control', 'no-cache');
 
+        // Send initial data (user message and chat info)
+        res.write(JSON.stringify({ 
+            type: 'init',
+            userMessage,
+            title,
+            chat
+        }) + '\n');
+
+        let fullResponse = '';
+        let aiMessageId = null;
+
+        // Stream the response
+        await generateResponseStream(messages, async (chunk) => {
+            fullResponse += chunk;
+            res.write(JSON.stringify({ 
+                type: 'chunk',
+                content: chunk 
+            }) + '\n');
+        });
+
+        // Save the complete AI message
         const aiMessage = await messageModel.create({
-            chat: chatId || chat._id,
-            content: result.text,
+            chat: finalChatId,
+            content: fullResponse,
             role: "ai",
         })
 
-        res.status(201).json({
-            userMessage,
-            aiMessage,
-            title,
-            chat,
-        })
+        // Send completion signal
+        res.write(JSON.stringify({ 
+            type: 'complete',
+            aiMessage
+        }) + '\n');
+
+        res.end();
     } catch (error) {
         console.error("Error in sendMessage:", error);
-        res.status(500).json({ 
+        res.write(JSON.stringify({ 
+            type: 'error',
             message: "Error sending message",
             error: error.message 
-        });
+        }) + '\n');
+        res.end();
     }
 }
 

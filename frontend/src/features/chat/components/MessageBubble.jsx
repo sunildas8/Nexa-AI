@@ -1,35 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Copy, Check } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 /**
  * MessageBubble Component - Individual message display with copy functionality
+ * Displays streamed AI responses and user messages with markdown support
  */
 const MessageBubble = ({ message, isDark }) => {
   const [copied, setCopied] = useState(false);
-  const [displayedContent, setDisplayedContent] = useState('');
   const isUserMessage = message.role === 'user';
-
-  // Typing effect for AI messages
-  useEffect(() => {
-    if (isUserMessage) {
-      setDisplayedContent(message.content);
-      return;
-    }
-
-    let index = 0;
-    const typingSpeed = 5; // milliseconds per character
-    const timer = setInterval(() => {
-      if (index < message.content.length) {
-        setDisplayedContent(message.content.substring(0, index + 1));
-        index++;
-      } else {
-        clearInterval(timer);
-      }
-    }, typingSpeed);
-
-    return () => clearInterval(timer);
-  }, [message.content, isUserMessage]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(message.content);
@@ -105,7 +84,7 @@ const MessageBubble = ({ message, isDark }) => {
                 ),
               }}
             >
-              {displayedContent}
+              {message.content}
             </ReactMarkdown>
           </div>
         )}
@@ -132,21 +111,6 @@ const MessageBubble = ({ message, isDark }) => {
             )}
           </button>
         )}
-
-        <span
-          className={`text-xs mt-2 block ${
-            isUserMessage
-              ? 'text-blue-100'
-              : isDark
-              ? 'text-gray-500'
-              : 'text-gray-500'
-          }`}
-        >
-          {new Date(message.timestamp).toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit',
-          })}
-        </span>
       </div>
     </div>
   );
