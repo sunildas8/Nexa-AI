@@ -85,7 +85,7 @@ const Sidebar = ({
                 <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                   <button
                     onClick={(e) => handleMenuClick(e, chat.id)}
-                    className={`p-1 rounded-lg transition-all duration-200 ${
+                    className={`p-1 rounded-lg transition-all duration-200 cursor-pointer ${
                       isDark
                         ? 'text-gray-400 hover:bg-gray-700 hover:text-white'
                         : 'text-gray-600 hover:bg-gray-300'
@@ -146,7 +146,7 @@ const Sidebar = ({
               onDeleteChat(openDropdown);
               setOpenDropdown(null);
             }}
-            className={`w-full text-left px-3 py-2 flex items-center gap-2 text-sm rounded-lg transition-all duration-200 ${
+            className={`w-full text-left px-3 py-2 flex items-center gap-2 text-sm rounded-lg transition-all duration-200 cursor-pointer ${
               isDark
                 ? 'text-red-400 hover:bg-gray-700'
                 : 'text-red-600 hover:bg-gray-100'
