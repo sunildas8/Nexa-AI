@@ -8,7 +8,7 @@ const ChatInput = ({ onSendMessage, isLoading, isDark }) => {
   const [message, setMessage] = useState('');
   const [showTools, setShowTools] = useState(false);
   const [showModel, setShowModel] = useState(false);
-  const [selectedModel, setSelectedModel] = useState('Standard');
+  // const [selectedModel, setSelectedModel] = useState('Standard');
   const textareaRef = useRef(null);
   const toolsRef = useRef(null);
   const modelRef = useRef(null);
@@ -87,7 +87,7 @@ const ChatInput = ({ onSendMessage, isLoading, isDark }) => {
               <Plus size={20} />
             </button>
             
-            {showTools && (
+            {/* {showTools && (
               <div className={`absolute top-full left-0 mt-2 rounded-lg shadow-lg py-2 min-w-40 z-10 ${
                 isDark
                   ? 'bg-gray-800 border border-gray-700'
@@ -108,7 +108,7 @@ const ChatInput = ({ onSendMessage, isLoading, isDark }) => {
                   🔗 Web search
                 </button>
               </div>
-            )}
+            )} */}
           </div>
 
           {/* Textarea */}
@@ -128,7 +128,7 @@ const ChatInput = ({ onSendMessage, isLoading, isDark }) => {
           />
 
           {/* Model Selector */}
-          <div className="relative hidden sm:block" ref={modelRef}>
+          {/* <div className="relative hidden sm:block" ref={modelRef}>
             <button
               type="button"
               onClick={() => setShowModel(!showModel)}
@@ -171,7 +171,7 @@ const ChatInput = ({ onSendMessage, isLoading, isDark }) => {
                 ))}
               </div>
             )}
-          </div>
+          </div> */}
 
           {/* Voice Button */}
           <button

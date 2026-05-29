@@ -1,5 +1,5 @@
-import React from 'react';
-import { MessageSquare, Settings, Moon, Sun, Trash2, SquarePen } from 'lucide-react';
+import React, { useState } from 'react';
+import { MessageSquare, Settings, Moon, Sun, Trash2, SquarePen, MoreHorizontal } from 'lucide-react';
 
 /**
  * Sidebar Component - Left navigation panel with chat history and theme toggle
@@ -8,11 +8,22 @@ const Sidebar = ({
   chatHistory = [], 
   onNewChat, 
   onSelectChat, 
-  onClearHistory,
+  onDeleteChat,
   currentChatId, 
   isDark, 
   onToggleTheme 
 }) => {
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
+
+  const handleMenuClick = (e, chatId) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setDropdownPos({
+      top: rect.bottom + 5,
+      left: rect.right - 20
+    });
+    setOpenDropdown(openDropdown === chatId ? null : chatId);
+  };
   return (
     <div className={`w-64 h-screen flex flex-col border-r transition-colors duration-200 ${
       isDark 
@@ -52,22 +63,38 @@ const Sidebar = ({
         ) : (
           <div className="space-y-2">
             {chatHistory.map((chat) => (
-              <button
+              <div
                 key={chat.id}
-                onClick={() => onSelectChat(chat.id)}
-                className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-150 flex items-center gap-2 ${
-                  currentChatId === chat.id
-                    ? isDark
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-blue-100 text-blue-900'
-                    : isDark
-                    ? 'text-gray-300 hover:bg-gray-800'
-                    : 'text-gray-700 hover:bg-gray-200'
-                }`}
+                className="relative group"
               >
-                <MessageSquare size={14} className="shrink-0" />
-                <span className="truncate">{chat.title}</span>
-              </button>
+                <button
+                  onClick={() => onSelectChat(chat.id)}
+                  className={`w-full text-left px-3 py-2 rounded-xl text-sm transition-all duration-150 flex items-center justify-between gap-2 cursor-pointer ${
+                    currentChatId === chat.id
+                      ? isDark
+                        ? 'bg-gray-600 text-white'
+                        : 'bg-gray-200 text-gray-900'
+                      : isDark
+                      ? 'text-gray-300 hover:bg-gray-800'
+                      : 'text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  <span className="truncate pr-7">{chat.title}</span>
+                </button>
+                
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <button
+                    onClick={(e) => handleMenuClick(e, chat.id)}
+                    className={`p-1 rounded-lg transition-all duration-200 ${
+                      isDark
+                        ? 'text-gray-400 hover:bg-gray-700 hover:text-white'
+                        : 'text-gray-600 hover:bg-gray-300'
+                    }`}
+                  >
+                    <MoreHorizontal size={16} />
+                  </button>
+                </div>
+              </div>
             ))}
           </div>
         )}
@@ -75,20 +102,6 @@ const Sidebar = ({
 
       {/* Footer Controls */}
       <div className="border-t p-3 space-y-2" style={{borderColor: isDark ? '#1f2937' : '#e5e7eb'}}>
-        {chatHistory.length > 0 && (
-          <button
-            onClick={onClearHistory}
-            className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
-              isDark
-                ? 'text-gray-400 hover:bg-gray-800 hover:text-red-400'
-                : 'text-gray-600 hover:bg-gray-200 hover:text-red-600'
-            }`}
-          >
-            <Trash2 size={16} />
-            Clear History
-          </button>
-        )}
-
         <button
           onClick={onToggleTheme}
           className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 cursor-pointer ${
@@ -114,6 +127,36 @@ const Sidebar = ({
           Settings
         </button>
       </div>
+
+      {/* Dropdown Menu */}
+      {openDropdown && (
+        <div
+          className={`fixed rounded-lg shadow-lg z-50 w-32 ${
+            isDark
+              ? 'bg-gray-800 border border-gray-700'
+              : 'bg-white border border-gray-300'
+          }`}
+          style={{
+            top: `${dropdownPos.top}px`,
+            left: `${dropdownPos.left}px`
+          }}
+        >
+          <button
+            onClick={() => {
+              onDeleteChat(openDropdown);
+              setOpenDropdown(null);
+            }}
+            className={`w-full text-left px-3 py-2 flex items-center gap-2 text-sm rounded-lg transition-all duration-200 ${
+              isDark
+                ? 'text-red-400 hover:bg-gray-700'
+                : 'text-red-600 hover:bg-gray-100'
+            }`}
+          >
+            <Trash2 size={14} />
+            Delete
+          </button>
+        </div>
+      )}
     </div>
   );
 };

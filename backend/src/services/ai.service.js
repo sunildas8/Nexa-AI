@@ -23,7 +23,7 @@ const searchInternetTool = tool(searchInternet, {
 })
 
 const agent = createAgent({
-  model: geminiModel,
+  model: mistralModel,
   tools: [searchInternetTool]
 })
 

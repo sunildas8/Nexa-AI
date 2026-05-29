@@ -19,11 +19,11 @@ const MessageBubble = ({ message, isDark }) => {
   return (
     <div className={`flex ${isUserMessage ? 'justify-end' : 'justify-start'} mb-4`}>
       <div
-        className={`group max-w-full lg:max-w-full xl:max-w-full px-4 py-3 rounded-lg transition-all duration-200 ${
+        className={`group max-w-full lg:max-w-full xl:max-w-full px-4 py-2.5 rounded-2xl font-semibold transition-all duration-200 ${
           isUserMessage
             ? isDark
-              ? 'bg-blue-600 text-white rounded-br-none'
-              : 'bg-blue-500 text-white rounded-br-none'
+              ? 'bg-gray-700 text-white rounded-br-none'
+              : 'bg-gray-200 text-black rounded-br-none'
             : isDark
             ? ' text-gray-100 rounded-bl-none'
             : ' text-gray-900 rounded-bl-none'

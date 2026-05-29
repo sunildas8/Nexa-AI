@@ -2,7 +2,8 @@ import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTheme } from '../hooks/useTheme';
 import { useChat } from '../hooks/useChat';
-import { setCurrentChatId, setChats } from '../chat.slice';
+import { setCurrentChatId, setChats, deleteChat } from '../chat.slice';
+import { deleteChat as deleteChatApi } from '../service/chat.api';
 import Sidebar from '../components/Sidebar';
 import ChatWindow from '../components/ChatWindow';
 import ChatInput from '../components/ChatInput';
@@ -60,6 +61,24 @@ const Dashboard = () => {
     }
   };
 
+  const handleDeleteChat = async (chatId) => {
+    try {
+      // Call API to delete the chat
+      await deleteChatApi(chatId);
+      
+      // Dispatch Redux action to remove from state
+      dispatch(deleteChat({ chatId }));
+      
+      // If the deleted chat is the currently selected one, reset it
+      if (currentChatId === chatId) {
+        dispatch(setCurrentChatId(null));
+      }
+    } catch (error) {
+      console.error('Error deleting chat:', error);
+      alert('Failed to delete chat. Please try again.');
+    }
+  };
+
   return (
     <div className={`flex h-screen overflow-hidden transition-colors duration-200 ${
       isDark ? 'bg-gray-900' : 'bg-white'
@@ -69,6 +88,7 @@ const Dashboard = () => {
         onNewChat={handleNewChat}
         onGetChats={handleGetChats}
         onSelectChat={handleLoadChat}
+        onDeleteChat={handleDeleteChat}
         onClearHistory={handleClearHistory}
         currentChatId={currentChatId}
         isDark={isDark}
