@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Copy, Check } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 /**
  * MessageBubble Component - Individual message display with copy functionality
@@ -83,6 +84,7 @@ const MessageBubble = ({ message, isDark }) => {
                   <td className={`border px-2 py-1 ${isDark ? 'border-gray-600' : 'border-gray-300'}`} {...props} />
                 ),
               }}
+              remarkPlugins={[remarkGfm]}
             >
               {message.content}
             </ReactMarkdown>

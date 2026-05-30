@@ -87,14 +87,19 @@ export const useChat = () => {
                         id: aiMessageId
                     }));
                 } else if (event.type === 'chunk') {
-                    // Accumulate chunk and update message
-                    aiMessageContent += event.content;
-                    dispatch(addNewMessage({
-                        chatId: finalChatId,
-                        content: aiMessageContent,
-                        role: 'ai',
-                        id: aiMessageId
-                    }));
+                    // Create character-by-character typing effect
+                    const chunkText = event.content;
+                    for (let char of chunkText) {
+                        aiMessageContent += char;
+                        dispatch(addNewMessage({
+                            chatId: finalChatId,
+                            content: aiMessageContent,
+                            role: 'ai',
+                            id: aiMessageId
+                        }));
+                        // Add delay between each character for typing effect (30ms per character)
+                        await new Promise(resolve => setTimeout(resolve, 5));
+                    }
                 } else if (event.type === 'complete') {
                     // Stream complete, update with final message
                     dispatch(addNewMessage({
