@@ -20,6 +20,7 @@ const Dashboard = () => {
   const chats = useSelector((state) => state.chat.chats);
   const currentChatId = useSelector((state) => state.chat.currentChatId);
   const isLoading = useSelector((state) => state.chat.isLoading);
+  const isAITyping = useSelector((state) => state.chat.isAITyping);
   const { user } = useSelector((state) => state.auth);
 
   // Derive current messages from Redux store
@@ -114,7 +115,7 @@ const Dashboard = () => {
         <div className={`flex flex-col overflow-scroll transition-all duration-200 my-auto ${
           messages.length === 0 ? 'justify-center' : 'flex-1'
         }`}>
-          <ChatWindow messages={messages} isLoading={isLoading} isDark={isDark} />
+          <ChatWindow messages={messages} isLoading={isLoading} isAITyping={isAITyping} isDark={isDark} />
 
           <ChatInput
             onSendMessage={handleSendMessage}

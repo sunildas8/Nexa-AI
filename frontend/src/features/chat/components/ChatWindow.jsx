@@ -5,7 +5,7 @@ import TypingIndicator from './TypingIndicator';
 /**
  * ChatWindow Component - Main chat message display area with auto-scroll
  */
-const ChatWindow = ({ messages, isLoading, isDark }) => {
+const ChatWindow = ({ messages, isLoading, isAITyping, isDark }) => {
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -51,7 +51,7 @@ const ChatWindow = ({ messages, isLoading, isDark }) => {
           />
         ))}
 
-        {isLoading && <TypingIndicator isDark={isDark} />}
+        {isAITyping && <TypingIndicator isDark={isDark} />}
 
         <div ref={messagesEndRef} />
       </div>

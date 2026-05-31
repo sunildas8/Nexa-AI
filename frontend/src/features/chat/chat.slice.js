@@ -6,6 +6,7 @@ const chatSlice = createSlice({
         chats: {},
         currentChatId: null,
         isLoading: false,
+        isAITyping: false,
         error: null,
     },
     reducers: {
@@ -54,6 +55,9 @@ const chatSlice = createSlice({
         setLoading: (state, action) => {
             state.isLoading = action.payload
         },
+        setAITyping: (state, action) => {
+            state.isAITyping = action.payload
+        },
         setError: (state, action) => {
             state.error = action.payload
         },
@@ -70,7 +74,7 @@ const chatSlice = createSlice({
     }
 })
 
-export const { setChats, setCurrentChatId, setLoading, setError, createNewChat, addNewMessage, deleteChat, setMessagesForChat } = chatSlice.actions;
+export const { setChats, setCurrentChatId, setLoading, setAITyping, setError, createNewChat, addNewMessage, deleteChat, setMessagesForChat } = chatSlice.actions;
 export default chatSlice.reducer;
 
 // chats = {

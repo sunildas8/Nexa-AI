@@ -1,6 +1,6 @@
 import { initializeSocketConnection } from '../service/chat.socket';
-import { sendMessage, getChatMessages, getChats, deleteChat } from '../service/chat.api';
-import { setChats, setCurrentChatId, setLoading, setError, createNewChat, addNewMessage, deleteChat as deleteChatFromStore, setMessagesForChat  } from '../chat.slice';
+import { sendMessage, getChatMessages, getChats } from '../service/chat.api';
+import { setChats, setCurrentChatId, setLoading, setAITyping, setError, createNewChat, addNewMessage, deleteChat as deleteChatFromStore, setMessagesForChat  } from '../chat.slice';
 import { useDispatch } from 'react-redux';
 
 /**
@@ -42,6 +42,7 @@ export const useChat = () => {
             
             // Set loading state
             dispatch(setLoading(true));
+            dispatch(setAITyping(true));
             dispatch(setError(null));
             
             // Create initial AI message placeholder
@@ -87,6 +88,9 @@ export const useChat = () => {
                         id: aiMessageId
                     }));
                 } else if (event.type === 'chunk') {
+                    // AI response started, hide typing indicator
+                    dispatch(setAITyping(false));
+                    
                     // Create character-by-character typing effect
                     const chunkText = event.content;
                     for (let char of chunkText) {
@@ -109,6 +113,7 @@ export const useChat = () => {
                         id: aiMessageId
                     }));
                 } else if (event.type === 'error') {
+                    dispatch(setAITyping(false));
                     dispatch(setError(event.message || 'Failed to send message'));
                 }
             }
@@ -116,6 +121,7 @@ export const useChat = () => {
             dispatch(setLoading(false));
         } catch (error) {
             console.error('Error sending message:', error);
+            dispatch(setAITyping(false));
             dispatch(setError(error.message || 'Failed to send message'));
             dispatch(setLoading(false));
         }
