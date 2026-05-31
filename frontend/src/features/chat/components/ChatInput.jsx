@@ -7,7 +7,7 @@ import { Send, Plus, Mic, ChevronDown } from 'lucide-react';
 const ChatInput = ({ onSendMessage, isLoading, isDark }) => {
   const [message, setMessage] = useState('');
   const [showTools, setShowTools] = useState(false);
-  const [showModel, setShowModel] = useState(false);
+  const [_showModel, setShowModel] = useState(false);
   // const [selectedModel, setSelectedModel] = useState('Standard');
   const textareaRef = useRef(null);
   const toolsRef = useRef(null);

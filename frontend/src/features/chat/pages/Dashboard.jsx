@@ -1,9 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router';
 import { useTheme } from '../hooks/useTheme';
 import { useChat } from '../hooks/useChat';
 import { setCurrentChatId, setChats, deleteChat } from '../chat.slice';
 import { deleteChat as deleteChatApi } from '../service/chat.api';
+import { setUser } from '../../auth/auth.slice';
+import { ChevronDown, LogOut } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import ChatWindow from '../components/ChatWindow';
 import ChatInput from '../components/ChatInput';
@@ -14,7 +17,10 @@ import ChatInput from '../components/ChatInput';
 const Dashboard = () => {
   const chat = useChat();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { isDark, toggleTheme } = useTheme();
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const profileMenuRef = useRef(null);
   
   // Get Redux state
   const chats = useSelector((state) => state.chat.chats);
@@ -36,6 +42,22 @@ const Dashboard = () => {
       chat.initializeSocketConnection(); 
     }
   }, [chat]);
+
+  // Close profile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(e.target)) {
+        setShowProfileMenu(false);
+      }
+    };
+
+    if (showProfileMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [showProfileMenu]);
 
   const handleSendMessage = async (content) => {
     await chat.handleSendMessage(content, currentChatId);
@@ -80,6 +102,11 @@ const Dashboard = () => {
     }
   };
 
+  const handleLogout = () => {
+    dispatch(setUser(null));
+    navigate('/login');
+  };
+
   return (
     <div className={`flex h-screen overflow-hidden transition-colors duration-200 ${
       isDark ? 'bg-gray-900' : 'bg-white'
@@ -102,13 +129,61 @@ const Dashboard = () => {
             ? 'bg-gray-900 border-gray-800'
             : 'bg-white border-gray-200'
         }`}>
-          <div className="flex justify-between">
+          <div className="flex justify-between items-center">
             <h1 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
               NexaAI 
             </h1>
-            <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-              {user?.email ? `Logged in as ${user.email}` : 'Welcome'}
-            </p>
+            
+            {/* Profile Pill with Dropdown */}
+            <div className="relative" ref={profileMenuRef}>
+              <button
+                onClick={() => setShowProfileMenu(!showProfileMenu)}
+                className={`flex items-center gap-2 px-2 py-1.5 rounded-full transition-colors duration-200 ${
+                  isDark
+                    ? 'bg-gray-800 hover:bg-gray-700'
+                    : 'bg-gray-100 hover:bg-gray-200'
+                }`}
+              >
+                {/* Avatar Circle */}
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-white font-semibold text-sm ${
+                  isDark ? 'bg-blue-600' : 'bg-blue-500'
+                }`}>
+                  {user?.username ? user.username.charAt(0).toUpperCase() : 'U'}
+                </div>
+                
+                {/* Username */}
+                <span className={`text-sm font-medium ${isDark ? 'text-gray-200' : 'text-gray-900'}`}>
+                  {user?.username || 'User'}
+                </span>
+                
+                {/* Dropdown Arrow */}
+                <ChevronDown size={16} className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`} />
+              </button>
+
+              {/* Dropdown Menu */}
+              {showProfileMenu && (
+                <div className={`absolute right-0 mt-2 w-48 rounded-lg shadow-lg z-50 transition-all duration-200 ${
+                  isDark
+                    ? 'bg-gray-800 border border-gray-700'
+                    : 'bg-white border border-gray-200'
+                }`}>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setShowProfileMenu(false);
+                    }}
+                    className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors duration-200 hover:rounded-lg ${
+                      isDark
+                        ? 'text-red-400 hover:bg-gray-700'
+                        : 'text-red-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    <LogOut size={16} />
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

@@ -11,11 +11,9 @@ export const initSocket = (httpServer) => {
     })
 
     console.log("✅ Socket.io server is Running");
-    
-
     io.on('connection', (socket) => {
-        console.log('A user connected' + socket.id);
-    })
+        console.log('🔌 New client connected:', socket.id);
+    });
 }
 
 export const getIO = () => {
