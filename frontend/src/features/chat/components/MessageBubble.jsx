@@ -18,16 +18,16 @@ const MessageBubble = ({ message, isDark }) => {
   };
 
   return (
-    <div className={`flex ${isUserMessage ? 'justify-end' : 'justify-start'} mb-4`}>
+    <div className={`flex ${isUserMessage ? 'justify-end' : 'justify-start'} mb-3 sm:mb-4`}>
       <div
-        className={`group max-w-full lg:max-w-full xl:max-w-full px-4 py-2.5 rounded-2xl font-semibold transition-all duration-200 ${
+        className={`group max-w-xs sm:max-w-sm md:max-w-md lg:max-w-2xl xl:max-w-3xl px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-semibold transition-all duration-200 ${
           isUserMessage
             ? isDark
               ? 'bg-gray-700 text-white rounded-br-none'
               : 'bg-gray-200 text-black rounded-br-none'
             : isDark
-            ? ' text-gray-100 rounded-bl-none'
-            : ' text-gray-900 rounded-bl-none'
+            ? 'text-gray-100 rounded-bl-none'
+            : 'text-gray-900 rounded-bl-none'
         }`}
       >
         {isUserMessage ? (
@@ -94,7 +94,7 @@ const MessageBubble = ({ message, isDark }) => {
         {!isUserMessage && (
           <button
             onClick={handleCopy}
-            className={`mt-2 flex items-center gap-1 text-xs px-2 py-1 rounded transition-all duration-200 opacity-0 group-hover:opacity-100 ${
+            className={`mt-1.5 sm:mt-2 flex items-center gap-1 text-xs px-2 py-1 rounded transition-all duration-200 opacity-0 group-hover:opacity-100 ${
               isDark
                 ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                 : 'bg-gray-200 text-gray-600 hover:bg-gray-300'

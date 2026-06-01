@@ -119,24 +119,24 @@ const Register = () => {
   }
 
   return (
-    <div className='min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-4 dark'>
-      <div className=' w-full max-w-md'>
+    <div className='min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center px-4 py-8 sm:px-6 md:px-8 dark'>
+      <div className='w-full max-w-md'>
         {/* Background gradient decoration */}
         <div className='absolute inset-0 bg-linear-to-r from-[#60A6AF]/10 to-cyan-500/10 rounded-3xl blur-3xl -z-10' />
 
-        <div className='page-transition relative bg-slate-900/80 backdrop-blur-xl border border-cyan-500/20 rounded-2xl shadow-2xl p-8'>
+        <div className='page-transition relative bg-slate-900/80 backdrop-blur-xl border border-cyan-500/20 rounded-xl sm:rounded-2xl shadow-2xl p-5 sm:p-6 md:p-8 max-h-screen overflow-y-auto'>
           {/* Header */}
-          <div className='mb-8 text-center'>
-            <h1 className='text-3xl font-bold bg-linear-to-r from-[#60A6AF] to-cyan-400 bg-clip-text text-transparent mb-2'>
+          <div className='mb-6 sm:mb-8 text-center'>
+            <h1 className='text-2xl sm:text-3xl font-bold bg-linear-to-r from-[#60A6AF] to-cyan-400 bg-clip-text text-transparent mb-2'>
               Create Account
             </h1>
-            <p className='text-slate-400 text-sm'>Join us to get started</p>
+            <p className='text-slate-400 text-xs sm:text-sm'>Join us to get started</p>
           </div>
 
             {/* Success Message */}
           {successMessage && (
-            <Alert className='mb-6 border-green-500/50 bg-green-50/10'>
-              <AlertDescription className='text-green-400'>
+            <Alert className='mb-4 sm:mb-6 border-green-500/50 bg-green-50/10'>
+              <AlertDescription className='text-green-400 text-xs sm:text-sm'>
                 {successMessage}
               </AlertDescription>
             </Alert>
@@ -144,18 +144,18 @@ const Register = () => {
 
           {/* Error Message */}
           {error && (
-            <Alert variant='destructive' className='mb-6 border-red-500/50 bg-red-50/10'>
-              <AlertDescription className='text-red-400'>
+            <Alert variant='destructive' className='mb-4 sm:mb-6 border-red-500/50 bg-red-50/10'>
+              <AlertDescription className='text-red-400 text-xs sm:text-sm'>
                 {error}
               </AlertDescription>
             </Alert>
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className='space-y-5'>
+          <form onSubmit={handleSubmit} className='space-y-3 sm:space-y-4'>
             {/* Username Field */}
-            <div className='space-y-2'>
-              <Label htmlFor='username' className='text-slate-200'>
+            <div className='space-y-1.5 sm:space-y-2'>
+              <Label htmlFor='username' className='text-slate-200 text-xs sm:text-sm'>
                 Username
               </Label>
               <Input
@@ -166,10 +166,10 @@ const Register = () => {
                 value={formData.username}
                 onChange={handleChange}
                 disabled={submitting}
-                className={`${errors.username ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/20' : ''}`}
+                className={`text-xs sm:text-sm h-10 sm:h-11 ${errors.username ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/20' : ''}`}
               />
               {errors.username && (
-                <Alert variant='destructive' className='mt-2'>
+                <Alert variant='destructive' className='mt-1.5 sm:mt-2'>
                   <AlertDescription className='text-red-400 text-xs'>
                     {errors.username}
                   </AlertDescription>
@@ -178,8 +178,8 @@ const Register = () => {
             </div>
 
             {/* Email Field */}
-            <div className='space-y-2'>
-              <Label htmlFor='email' className='text-slate-200'>
+            <div className='space-y-1.5 sm:space-y-2'>
+              <Label htmlFor='email' className='text-slate-200 text-xs sm:text-sm'>
                 Email Address
               </Label>
               <Input
@@ -190,10 +190,10 @@ const Register = () => {
                 value={formData.email}
                 onChange={handleChange}
                 disabled={submitting}
-                className={`${errors.email ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/20' : ''}`}
+                className={`text-xs sm:text-sm h-10 sm:h-11 ${errors.email ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/20' : ''}`}
               />
               {errors.email && (
-                <Alert variant='destructive' className='mt-2'>
+                <Alert variant='destructive' className='mt-1.5 sm:mt-2'>
                   <AlertDescription className='text-red-400 text-xs'>
                     {errors.email}
                   </AlertDescription>
@@ -202,8 +202,8 @@ const Register = () => {
             </div>
 
             {/* Password Field */}
-            <div className='space-y-2'>
-              <Label htmlFor='password' className='text-slate-200'>
+            <div className='space-y-1.5 sm:space-y-2'>
+              <Label htmlFor='password' className='text-slate-200 text-xs sm:text-sm'>
                 Password
               </Label>
               <PasswordInput
@@ -213,10 +213,10 @@ const Register = () => {
                 value={formData.password}
                 onChange={handleChange}
                 disabled={submitting}
-                className={`${errors.password ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/20' : ''}`}
+                className={`text-xs sm:text-sm h-10 sm:h-11 ${errors.password ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/20' : ''}`}
               />
               {errors.password && (
-                <Alert variant='destructive' className='mt-2'>
+                <Alert variant='destructive' className='mt-1.5 sm:mt-2'>
                   <AlertDescription className='text-red-400 text-xs'>
                     {errors.password}
                   </AlertDescription>
@@ -225,8 +225,8 @@ const Register = () => {
             </div>
 
             {/* Confirm Password Field */}
-            <div className='space-y-2'>
-              <Label htmlFor='confirmPassword' className='text-slate-200'>
+            <div className='space-y-1.5 sm:space-y-2'>
+              <Label htmlFor='confirmPassword' className='text-slate-200 text-xs sm:text-sm'>
                 Confirm Password
               </Label>
               <PasswordInput
@@ -236,10 +236,10 @@ const Register = () => {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 disabled={submitting}
-                className={`${errors.confirmPassword ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/20' : ''}`}
+                className={`text-xs sm:text-sm h-10 sm:h-11 ${errors.confirmPassword ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/20' : ''}`}
               />
               {errors.confirmPassword && (
-                <Alert variant='destructive' className='mt-2'>
+                <Alert variant='destructive' className='mt-1.5 sm:mt-2'>
                   <AlertDescription className='text-red-400 text-xs'>
                     {errors.confirmPassword}
                   </AlertDescription>
@@ -253,14 +253,14 @@ const Register = () => {
             <Button
               type='submit'
               disabled={submitting}
-              className='w-full h-11 text-base font-semibold rounded-lg cursor-pointer'
+              className='w-full h-10 sm:h-11 text-xs sm:text-base font-semibold rounded-lg cursor-pointer'
             >
               {submitting ? 'Creating account...' : 'Sign Up'}
             </Button>
           </form>
 
           {/* Footer */}
-          <div className='mt-6 text-center text-sm text-slate-400'>
+          <div className='mt-4 sm:mt-6 text-center text-xs sm:text-sm text-slate-400'>
             Already have an account?{' '}
             <button
               type='button'

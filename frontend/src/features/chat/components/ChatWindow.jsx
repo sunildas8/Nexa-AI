@@ -20,14 +20,14 @@ const ChatWindow = ({ messages, isLoading, isAITyping, isDark }) => {
 
   if (messages.length === 0 && !isLoading) {
     return (
-      <div className={`flex-1 flex flex-col items-center justify-center p-6 transition-colors duration-200 ${
+      <div className={`flex-1 flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 transition-colors duration-200 ${
         isDark ? 'bg-gray-900' : 'bg-white'
       }`}>
-        <div className="text-center">
-          <h2 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-            What’s on your mind today?
+        <div className="text-center max-w-md mx-auto">
+          <h2 className={`text-xl sm:text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+            What's on your mind today?
           </h2>
-          <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+          <p className={`text-xs sm:text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
             Start a conversation by typing your question below
           </p>
         </div>
@@ -37,7 +37,7 @@ const ChatWindow = ({ messages, isLoading, isAITyping, isDark }) => {
 
   return (
     <div
-      className={`flex-1 overflow-y-auto p-6 transition-colors duration-200 ${
+      className={`flex-1 overflow-y-auto p-4 sm:p-5 md:p-6 lg:p-8 transition-colors duration-200 ${
         isDark ? 'bg-gray-900' : 'bg-white'
       }`}
       style={{ scrollBehavior: 'smooth' }}

@@ -61,14 +61,14 @@ const ChatInput = ({ onSendMessage, isLoading, isDark }) => {
   };
 
   return (
-    <div className={`p-4 transition-colors duration-200 ${
+    <div className={`p-3 sm:p-4 md:p-5 transition-colors duration-200 ${
       isDark
         ? 'bg-gray-900'
         : 'bg-white'
     }`}>
       <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
         {/* Main Input Bar */}
-        <div className={`flex items-center gap-3 px-4 py-3 rounded-full border transition-all duration-200 ${
+        <div className={`flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-2xl sm:rounded-full border transition-all duration-200 ${
           isDark
             ? 'bg-gray-800 border-gray-800'
             : 'bg-gray-100 border-gray-300'
@@ -78,13 +78,13 @@ const ChatInput = ({ onSendMessage, isLoading, isDark }) => {
             <button
               type="button"
               onClick={() => setShowTools(!showTools)}
-              className={`shrink-0 p-2 rounded-full transition-all duration-200 cursor-pointer ${
+              className={`shrink-0 p-1.5 sm:p-2 rounded-full transition-all duration-200 cursor-pointer touch-target ${
                 isDark
                   ? 'text-gray-400 hover:bg-gray-700'
                   : 'text-gray-600 hover:bg-gray-200'
               }`}
             >
-              <Plus size={20} />
+              <Plus size={20} className="sm:size-5" />
             </button>
             
             {/* {showTools && (
@@ -118,7 +118,7 @@ const ChatInput = ({ onSendMessage, isLoading, isDark }) => {
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask Nexa AI..."
-            className={`flex-1 resize-none outline-none text-sm font-medium max-h-24 bg-transparent ${
+            className={`flex-1 resize-none outline-none text-xs sm:text-sm font-medium max-h-24 bg-transparent ${
               isDark
                 ? 'text-white placeholder-gray-500'
                 : 'text-gray-900 placeholder-gray-500'
@@ -177,7 +177,7 @@ const ChatInput = ({ onSendMessage, isLoading, isDark }) => {
           <button
             type="button"
             disabled={isLoading}
-            className={`shrink-0 p-2 rounded-full transition-all duration-200 cursor-pointer ${
+            className={`shrink-0 p-1.5 sm:p-2 rounded-full transition-all duration-200 cursor-pointer touch-target ${
               isLoading
                 ? isDark
                   ? 'text-gray-400 hover:bg-gray-800 hover:text-gray-200'
@@ -187,14 +187,14 @@ const ChatInput = ({ onSendMessage, isLoading, isDark }) => {
                   : 'text-gray-600 hover:bg-gray-200'
             }`}
           >
-            <Mic size={20} />
+            <Mic size={20} className="sm:size-5" />
           </button>
 
           {/* Send Button */}
           <button
             type="submit"
             disabled={!message.trim() || isLoading}
-            className={`shrink-0 p-2 rounded-full transition-all duration-200 cursor-pointer ${
+            className={`shrink-0 p-1.5 sm:p-2 rounded-full transition-all duration-200 cursor-pointer touch-target ${
               !message.trim() || isLoading
                 ? isDark
                   ? 'text-gray-700 cursor-not-allowed'
@@ -204,7 +204,7 @@ const ChatInput = ({ onSendMessage, isLoading, isDark }) => {
                 : 'text-blue-500 hover:bg-gray-200'
             }`}
           >
-            <Send size={20} />
+            <Send size={20} className="sm:size-5" />
           </button>
         </div>
       </form>

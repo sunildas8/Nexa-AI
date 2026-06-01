@@ -11,7 +11,8 @@ const Sidebar = ({
   onDeleteChat,
   currentChatId, 
   isDark, 
-  onToggleTheme 
+  onToggleTheme,
+  onMobileSidebarClose
 }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
@@ -31,16 +32,16 @@ const Sidebar = ({
         : 'bg-gray-50 border-gray-200'
     }`}>
       {/* Header */}
-      <div className="p-4 border-b" style={{borderColor: isDark ? '#1f2937' : '#e5e7eb'}}>
+      <div className="p-4 border-b transition-colors" style={{borderColor: isDark ? '#1f2937' : '#e5e7eb'}}>
         <div className="flex items-center gap-2 mb-4">
           <img src="Nexa_AI.png" alt="" className='w-10'/>
         </div>
         <button
           onClick={onNewChat}
-          className={`w-full flex items-center gap-2 px-4 py-2 rounded-lg font-medium text- transition-all duration-200 cursor-pointer ${
+          className={`w-full flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 cursor-pointer ${
             isDark
               ? 'bg-gray-800 text-white hover:bg-gray-700'
-              : 'bg-white text-gray-900 border border-gray-300 hover:bg-gray-100'
+              : 'bg-white text-gray-900 hover:bg-gray-200 shadow-[0px_0px_5px_0px_rgba(0,0,0,0.1)]'
           }`}
         >
           <SquarePen size={16} />
@@ -68,7 +69,10 @@ const Sidebar = ({
                 className="relative group"
               >
                 <button
-                  onClick={() => onSelectChat(chat.id)}
+                  onClick={() => {
+                    onSelectChat(chat.id);
+                    onMobileSidebarClose?.();
+                  }}
                   className={`w-full text-left px-3 py-2 rounded-xl text-sm transition-all duration-150 flex items-center justify-between gap-2 cursor-pointer ${
                     currentChatId === chat.id
                       ? isDark
@@ -101,7 +105,7 @@ const Sidebar = ({
       </div>
 
       {/* Footer Controls */}
-      <div className="border-t p-3 space-y-2" style={{borderColor: isDark ? '#1f2937' : '#e5e7eb'}}>
+      <div className="border-t p-3 transition-colors space-y-2" style={{borderColor: isDark ? '#1f2937' : '#e5e7eb'}}>
         <button
           onClick={onToggleTheme}
           className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 cursor-pointer ${
