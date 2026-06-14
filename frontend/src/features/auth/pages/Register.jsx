@@ -13,7 +13,7 @@ const Register = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const { handleRegister } = useAuth()
-  const { error, loading } = useSelector((state) => state.auth)
+  const { error, _loading } = useSelector((state) => state.auth)
   const [formData, setFormData] = useState({
     username: '',
     email: '',
