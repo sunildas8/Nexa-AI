@@ -38,11 +38,17 @@ const Dashboard = () => {
   // Convert chats object to array for Sidebar
   const chatHistory = Object.values(chats);
 
+  // Initialize socket connection once on mount
   useEffect(() => {
-    if (chat?.initializeSocketConnection) {
-      chat.initializeSocketConnection(); 
+    try {
+      if (chat?.initializeSocketConnection) {
+        chat.initializeSocketConnection(); 
+      }
+    } catch (error) {
+      console.error('Failed to initialize socket:', error);
     }
-  }, [chat]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
 
   // Close profile menu when clicking outside
   useEffect(() => {

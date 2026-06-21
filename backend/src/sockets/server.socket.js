@@ -7,7 +7,11 @@ export const initSocket = (httpServer) => {
         cors: {
             origin: 'https://nexa-ai-chatgpt.vercel.app',
             credentials: true
-        }
+        },
+        transports: ['websocket', 'polling'],
+        allowEIO3: true,
+        pingInterval: 25000,
+        pingTimeout: 60000
     })
 
     console.log("✅ Socket.io server is Running");
