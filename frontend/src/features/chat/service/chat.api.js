@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://localhost:3000',
+    baseURL: 'https://nexa-ai-odre.vercel.app',
     withCredentials: true
 });
 
@@ -10,7 +10,7 @@ const api = axios.create({
  * Returns a promise that resolves to an async iterable of stream events
  */
 export const sendMessage = async(message, chatId) => {
-    const response = await fetch('http://localhost:3000/api/chats/message', {
+    const response = await fetch('https://nexa-ai-odre.vercel.app/api/chats/message', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
