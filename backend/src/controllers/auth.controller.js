@@ -30,7 +30,7 @@ export async function register(req, res) {
         <p>Thank you for registering with us. We're excited to have you on board!</p>
         <p>Plese verify your email by clicking the link below:</p>
         <button style="background-color: #4CAF50; color: white; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; border-radius: 5px; border: none; cursor: pointer;">
-            <a href="http://localhost:3000/api/auth/verify-email?token=${emailverificationToken}" style="color: white; text-decoration: none;">Verify Email</a>
+            <a href="https://nexa-ai-odre.vercel.app/api/auth/verify-email?token=${emailverificationToken}" style="color: white; text-decoration: none;">Verify Email</a>
         </button>
         <p>Feel free to explore our platform and let us know if you have any questions.</p>
         <p>Best regards,<br/>The GyanAI Team</p>
@@ -146,7 +146,7 @@ export async function verifyEmail(req, res) {
 
         const html = `<h1>Email Verified Successfully!</h1> 
         <p>Your email has been verified. You can now log in to your account.</p> 
-        <a href="http://localhost:3000/login">Go to Login</a>`
+        <a href="https://nexa-ai-chatgpt.vercel.app/login">Go to Login</a>`
 
         res.status(200).send(html);
     } catch (error) {

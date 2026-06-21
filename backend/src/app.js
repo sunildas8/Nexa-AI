@@ -14,7 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(morgan('dev'));
 app.use(cors({
-  origin: 'http://localhost:5173', // Update with your frontend URL
+  origin: 'https://nexa-ai-chatgpt.vercel.app', // Update with your frontend URL
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
 }))
