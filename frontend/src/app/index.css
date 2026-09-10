@@ -30,3 +30,78 @@
 .page-transition-exit {
   animation: fadeOut 0.3s ease-in-out forwards;
 }
+
+@keyframes preloaderPulse {
+  0%,
+  100% {
+    transform: scaleY(0.55);
+    opacity: 0.45;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes preloaderFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #0b1324;
+  color: #f5f7ff;
+  animation: preloaderFadeIn 0.25s ease-out;
+}
+
+.preloader-mark {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 2.5rem;
+}
+
+.preloader-mark span {
+  display: block;
+  width: 0.45rem;
+  height: 1.8rem;
+  border-radius: 999px;
+  background: #69d2c0;
+  animation: preloaderPulse 0.9s ease-in-out infinite;
+}
+
+.preloader-mark span:nth-child(2) {
+  animation-delay: 0.15s;
+  background: #f7c873;
+}
+
+.preloader-mark span:nth-child(3) {
+  animation-delay: 0.3s;
+  background: #ee8f89;
+}
+
+.preloader-name {
+  margin: 1.25rem 0 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.preloader-status {
+  margin: 0.4rem 0 0;
+  color: #aab5ca;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
