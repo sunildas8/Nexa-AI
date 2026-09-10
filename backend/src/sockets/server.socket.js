@@ -1,11 +1,18 @@
 import { Server } from 'socket.io';
 
 var io;
+const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    'https://nexa-ai-chatgpt.vercel.app',
+].filter(Boolean);
+
+const isAllowedOrigin = (origin) => allowedOrigins.includes(origin) ||
+    /^https:\/\/nexa-ai-chatgpt(?:-[a-z0-9-]+)?\.vercel\.app$/i.test(origin);
 
 export const initSocket = (httpServer) => {
     io = new Server(httpServer, {
         cors: {
-            origin: 'https://nexa-ai-chatgpt.vercel.app',
+            origin: (origin, callback) => callback(null, isAllowedOrigin(origin)),
             credentials: true
         },
         transports: ['websocket', 'polling'],

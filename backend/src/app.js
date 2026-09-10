@@ -7,6 +7,17 @@ import morgan from 'morgan';
 import cors from 'cors';
 
 const app = express();
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'https://nexa-ai-chatgpt.vercel.app',
+].filter(Boolean);
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+
+  return allowedOrigins.includes(origin) ||
+    /^https:\/\/nexa-ai-chatgpt(?:-[a-z0-9-]+)?\.vercel\.app$/i.test(origin);
+};
 
 // Middleware
 app.use(express.json());
@@ -14,7 +25,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(morgan('dev'));
 app.use(cors({
-  origin: 'https://nexa-ai-chatgpt.vercel.app', // Update with your frontend URL
+  origin: (origin, callback) => {
+    if (isAllowedOrigin(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`Origin not allowed by CORS: ${origin}`));
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
 }))
